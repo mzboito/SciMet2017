@@ -1,0 +1,45 @@
+---
+title: "A study about salary difference in Brazil"
+author: "Marcely Zanon Boito"
+date: "December 21, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The Data sets
+We have six data sets, each one representing a different working field: architecture, medicine, engineering, economy, law and street cleaning. All these datasets have information about people registred as payed professionals for that area, and they have information about number of hours, salary average, the salary minimum per hour, the gender, the age and employment time.
+
+## The Problem and the Hypothesis:
+Having information about different six different working fields at Brazil, we want to identify:
+
+1. Where we have the bigger salary gaps per gender;
+
+2. How time of scolarity affects:
+
+  + 2.1. The salary;
+  
+  + 2.2. The employment time;
+  
+3. The bigger estability (measured as average employment time);
+
+4. How age affect the salary:
+
+  + 4.1. When one get older in Brazil, do they gain more or less money?
+
+
+```{r cars}
+summary(architect)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
