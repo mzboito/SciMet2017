@@ -1,6 +1,0 @@
-architect = read.csv("data/architect.csv")
-civil_engineer = read.csv("data/civil_engineer.csv")
-economist = read.csv("economist.csv")
-lawyer = read.csv("lawyer.csv")
-street_cleaner = read.csv("street_cleaner.csv")
-doctor_general_practice = read.csv("doctor_general_practice.csv")
