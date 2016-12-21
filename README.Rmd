@@ -30,8 +30,9 @@ Having information about different six different working fields at Brazil, we wa
   + 4.1. When one get older in Brazil, do they gain more or less money?
 
 
-```{r cars}
-summary(architect)
+```{r }
+load(file="data/economist.Rdata")
+summary(economist)
 ```
 
 ## Including Plots
@@ -39,7 +40,11 @@ summary(architect)
 You can also embed plots, for example:
 
 ```{r pressure, echo=FALSE}
-plot(pressure)
+hist(economist$age, breaks=4,main="Age distribution over the dataset", xlab="Age")
+plot(economist$age, economist$avg_salary)
+
+require(ggplot2)
+qplot(economist$age, economist$avg_salary)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
