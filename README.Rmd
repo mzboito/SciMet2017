@@ -3,8 +3,8 @@ title: "A study about salary difference in Brazil"
 author: "Marcely Zanon Boito"
 date: "December 21, 2016"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -29,7 +29,7 @@ Using this data, the objective is to identify how these different factors (age, 
 ## First Dataset: Economist set
 We have seven variables in this dataset: contract hours, age, gender, scholarity, average salary, minimum per hour, and employment time. The table bellow was generated using R "summary" command and sit shows the general
 
-![](images/estatistic_table.png)
+![General metrics for the variables in the dataset](images/estatistic_table.png)
 
 * Scholarity: 
 
@@ -40,32 +40,44 @@ library(ggplot2)
 load(file="data/economist.Rdata")
 meanE <- mean(economist$Scholarity)
 std <- sd(economist$Scholarity)
-ggplot(data = economist, aes(economist$Scholarity)) + geom_bar(fill="white", colour = "black") + labs(x= "age")+ geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") +  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed")  + geom_vline(aes(xintercept = median(economist$Scholarity), colour = "median"), linetype = "dashed")   + 
-  scale_colour_manual(name = "Central Tendency Measurements", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
+ggplot(data = economist, aes(economist$Scholarity)) + geom_bar(fill="white", colour = "black") + labs(x= "age") + geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") +  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed")  + geom_vline(aes(xintercept = median(economist$Scholarity), colour = "median"), linetype = "dashed") + scale_colour_manual(name = "Central Tendency Measurements", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
 ```
 
 * Age:
 
 ```{r}
-
 meanE <- mean(economist$age)
 std <- sd(economist$age)
-ggplot(data = economist, aes(economist$age)) + geom_bar(fill="white", colour = "black") + labs(x= "age")+ geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") +  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed")  + geom_vline(aes(xintercept = median(economist$age), colour = "median"))   + 
-  scale_colour_manual(name = "Central Tendency Measurements", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
-
-
+ggplot(data = economist, aes(economist$age)) + geom_bar(fill="white", colour = "black") + labs(x= "age")+ geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") + geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed") + geom_vline(aes(xintercept = median(economist$age), colour = "median"), linetype = "dashed")   + scale_colour_manual(name = "Central Tendency Measurements", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
 ```
 
+## Variables of interest versus Average Salary
+For these plots, we are using the log of the average salary. This change does not affect the values order, it only escales the data, helping to visualize it.
 
 # age x salary
 ```{r}
-qplot(economist$avg_salary, economist$age, xlab = "Average Salary", ylab = "Age") + geom_smooth()
-
+qplot(log(economist$avg_salary), economist$age, xlab = "Average Salary", ylab = "Age") 
 ```
 
 However, here we are not considering the amount of hours that each economist is doing per month, and it can give us the false impression that someone young is receiving a lot more money, where in reality they could only be working more.
 
 ```{r}
-qplot( (log(economist$avg_salary) / economist$contract_hours), economist$age, xlab = "Average Salary per Contract hours", ylab = "Age") + geom_smooth()
+qplot( (log(economist$avg_salary) / economist$contract_hours), economist$age, xlab = "Average Salary per Contract hours", ylab = "Age") 
 
 ```
+
+# gender x salary
+```{r}
+ggplot(data=economist, aes(x= factor(economist$gender), y=economist$avg_salary)) + geom_boxplot()
+```
+
+
+# scholarity x salary
+```{r}
+ggplot(data=economist, aes(x= factor(economist$Scholarity), y=economist$avg_salary)) + geom_boxplot()
+```
+
+
+
+
+
