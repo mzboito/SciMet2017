@@ -3,8 +3,8 @@ title: "A study about salary difference in Brazil"
 author: "Marcely Zanon Boito"
 date: "December 21, 2016"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -52,12 +52,12 @@ std <- sd(economist$age)
 ggplot(data = economist, aes(economist$age)) + geom_bar(fill="white", colour = "black") + labs(x= "age")+ geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") + geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed") + geom_vline(aes(xintercept = median(economist$age), colour = "median"), linetype = "dashed")   + scale_colour_manual(name = "Central Tendency Measurements", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
 ```
 
-## Variables of interest versus Average Salary
+## Variables of interest against Average Salary
 For these plots, we are using the log of the average salary. This change does not affect the values order, it only escales the data, helping to visualize it. In this section we are focusing in age and gender.
 
 # Age x Salary
 ```{r}
-qplot(economist$age, log(economist$avg_salary), ylab = "Average Salary", xlab = "Age") + geom_smooth()
+ggplot(data = economist, aes(economist$age, log(economist$avg_salary))) + geom_point() + labs(y = "Average Salary", x = "Age") + geom_smooth()
 ```
 
 
@@ -68,15 +68,25 @@ qplot(economist$age, (log(economist$avg_salary) / economist$contract_hours), yla
 
 ```
 
+After dividing the average salary per number of hours, the values are way more uniform. 
+
+
+
+```{r}
+qplot(economist$age, (log(economist$avg_salary) / economist$min_salary), ylab = "Average Salary per Minimum Salary", xlab = "Age") + geom_smooth()
+```
+
+????????????????
+
 # gender x salary
 ```{r}
 ggplot(data=economist, aes(x= factor(economist$gender), y=economist$avg_salary)) + geom_boxplot() + labs(x = "gender", y = "Average Salary") + geom_jitter(color = "gray")
 ```
 
 
-# scholarity x salary
+# Gender and Age against Average Salary
 ```{r}
-ggplot(data=economist, aes(x= factor(economist$Scholarity), y=economist$avg_salary)) + geom_boxplot() + labs(x = "Scholarity", y = "Average Salary")
+ggplot(data = economist, aes(economist$age, log(economist$avg_salary)/ economist$contract_hours )) + geom_point(color = factor(economist$gender)) + labs(y = "Average Salary", x = "Age") + scale_colour_manual(name = "lol", breaks = "gender", values = c(gender = "blue"))
 ```
 
 
