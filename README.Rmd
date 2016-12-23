@@ -29,13 +29,40 @@ Having information about different six different working fields at Brazil, we wa
 
   + 4.1. When one get older in Brazil, do they gain more or less money?
 
+## First Dataset: Economist set
+We have seven variables in this dataset: contract hours, age, gender, scholarity, average salary, minimum per hour, and employment time.
+
+# Non-categorical Variables
 
 ```{r }
 load(file="data/economist.Rdata")
-summary(economist)
+a <- economist
+a$gender = NULL
+a$Scholarity = NULL
+summary(a)
 ```
 
-## Including Plots
+# Categorical Variables
+
+Scholarity
+
+```{r}
+library(ggplot2)
+
+meanE <- mean(economist$Scholarity)
+std <- sd(economist$Scholarity)
+
+
+ggplot(data = economist, aes(economist$Scholarity) ) + geom_bar(fill="white", colour = "black") + labs(x= "scholarity")+ geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") +  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed")  + scale_colour_manual(name = "Central Tendency Elements", breaks = c("mean", "std"), values= c(mean = "red", std = "blue")) 
+```
+
+
+
+
+
+
+
+
 
 You can also embed plots, for example:
 
