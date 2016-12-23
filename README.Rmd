@@ -3,8 +3,8 @@ title: "A study about salary difference in Brazil"
 author: "Marcely Zanon Boito"
 date: "December 21, 2016"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -44,6 +44,7 @@ ggplot(data = economist, aes(economist$Scholarity)) + geom_bar(fill="white", col
 ```
 
 * Age:
+For age, we have an interesting number of di
 
 ```{r}
 meanE <- mean(economist$age)
@@ -52,29 +53,30 @@ ggplot(data = economist, aes(economist$age)) + geom_bar(fill="white", colour = "
 ```
 
 ## Variables of interest versus Average Salary
-For these plots, we are using the log of the average salary. This change does not affect the values order, it only escales the data, helping to visualize it.
+For these plots, we are using the log of the average salary. This change does not affect the values order, it only escales the data, helping to visualize it. In this section we are focusing in age and gender.
 
-# age x salary
+# Age x Salary
 ```{r}
-qplot(log(economist$avg_salary), economist$age, xlab = "Average Salary", ylab = "Age") 
+qplot(economist$age, log(economist$avg_salary), ylab = "Average Salary", xlab = "Age") + geom_smooth()
 ```
 
-However, here we are not considering the amount of hours that each economist is doing per month, and it can give us the false impression that someone young is receiving a lot more money, where in reality they could only be working more.
+
+Looking at these values together, it gives the impression that the average salary (despite some outliers) is increasing together with age. However, here we are not considering the amount of hours that each economist is working per month, and that could give us the false impression that someone old is receiving a lot more money (or vice-versa), where in reality they could be just working more. To fix that, I tried to plot the data using the variable contract hours to divide the average salary value, resulting in the plot below.
 
 ```{r}
-qplot( (log(economist$avg_salary) / economist$contract_hours), economist$age, xlab = "Average Salary per Contract hours", ylab = "Age") 
+qplot(economist$age, (log(economist$avg_salary) / economist$contract_hours), ylab = "Average Salary per Contract hours", xlab = "Age") + geom_smooth()
 
 ```
 
 # gender x salary
 ```{r}
-ggplot(data=economist, aes(x= factor(economist$gender), y=economist$avg_salary)) + geom_boxplot()
+ggplot(data=economist, aes(x= factor(economist$gender), y=economist$avg_salary)) + geom_boxplot() + labs(x = "gender", y = "Average Salary") + geom_jitter(color = "gray")
 ```
 
 
 # scholarity x salary
 ```{r}
-ggplot(data=economist, aes(x= factor(economist$Scholarity), y=economist$avg_salary)) + geom_boxplot()
+ggplot(data=economist, aes(x= factor(economist$Scholarity), y=economist$avg_salary)) + geom_boxplot() + labs(x = "Scholarity", y = "Average Salary")
 ```
 
 
