@@ -2,7 +2,9 @@
 title: "A study about salary difference in Brazil"
 author: "Marcely Zanon Boito"
 date: "December 21, 2016"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -27,51 +29,38 @@ Having information about different six different working fields at Brazil, we wa
 
 4. How age affect the salary:
 
-  + 4.1. When one get older in Brazil, do they gain more or less money?
+  + 4.1. When a person gets older in Brazil, do they gain more or less money?
 
 ## First Dataset: Economist set
 We have seven variables in this dataset: contract hours, age, gender, scholarity, average salary, minimum per hour, and employment time.
 
-# Non-categorical Variables
+
 
 ```{r }
 load(file="data/economist.Rdata")
-a <- economist
-a$gender = NULL
-a$Scholarity = NULL
-summary(a)
+summary(economist)
 ```
 
-# Categorical Variables
-
-Scholarity
+* Scholarity:
 
 ```{r}
 library(ggplot2)
-
 meanE <- mean(economist$Scholarity)
 std <- sd(economist$Scholarity)
+ggplot(data = economist, aes(economist$Scholarity) ) + geom_bar(fill="white", colour = "black") + labs(x= "scholarity")+ geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") +  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed")  + scale_colour_manual(name = "Central Tendency Measurements", breaks = c("mean", "std"), values= c(mean = "red", std = "blue")) 
+```
+
+Looking at the difference of frequency between the different scholarity levels in the dataset, I believe is going to be difficult to infer things based on the level of scholarity, since most of the dataset falls in the category 9.
+
+* Age:
+
+```{r}
+meanE <- mean(economist$age)
+std <- sd(economist$age)
+ggplot(data = economist, aes(economist$age)) + geom_bar(fill="white", colour = "black") + labs(x= "age")+ geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") +  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed")  + geom_vline(aes(xintercept = median(economist$age), colour = "median"))   + 
+  scale_colour_manual(name = "Central Tendency Measurements", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
 
 
-ggplot(data = economist, aes(economist$Scholarity) ) + geom_bar(fill="white", colour = "black") + labs(x= "scholarity")+ geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") +  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed")  + scale_colour_manual(name = "Central Tendency Elements", breaks = c("mean", "std"), values= c(mean = "red", std = "blue")) 
 ```
 
 
-
-
-
-
-
-
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-hist(economist$age, breaks=4,main="Age distribution over the dataset", xlab="Age")
-plot(economist$age, economist$avg_salary)
-
-require(ggplot2)
-qplot(economist$age, economist$avg_salary)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
