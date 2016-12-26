@@ -3,54 +3,109 @@ title: "A study about salary difference in Brazil"
 author: "Marcely Zanon Boito"
 date: "December 21, 2016"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 ## The Datasets
-In this report, I use datasets from the Brazilian Department of Labour. These datasets contain information about people registered as regular workers, following the "CBO" (brazilian official classification of professions).
-Because of the law structure in Brazil, it's possible to have underrepresentation for some professions (like doctors and lawyers, that sometimes register as partners in their business), and sometimes we also have a problem concerning the profession used for the registration, since sometimes a professional can be registered in two different ways (e.g. economists sometimes are registered as "analysts").
+In this report, I use datasets from the Brazilian Department of Labour, more specificaly from the RAIS report (Social Informations Annual Report). 
+These datasets contain information about all people registered as regular workers for the selected professions in 2014, following the "CBO" (brazilian official classification of professions).
 
-
-We have six datasets, each one representing a different profession: architecture, medicine, engineering, economy, law and street cleaning, and they present information about number of hours, salary average, the salary minimum per hour, the gender, the age and employment time.
+This information is available because in Brazil, every time that an employer contracts, promotes or terminates an employee contract, it's mandatory to include this information in the government system. For this study, we have six datasets, each one representing a different profession: architecture, medicine, engineering, economy, law and street cleaning.
 
 ## The Hypothesis:
 Using this data, the objective is to identify how these different factors (age, gender, scholarity, profession, etc) can impact the average salary. More specificaly, I would like to identify:
 
-1. Is there a gender discrimination? If it is the case, in which profession we have the biggest salary gap per gender?
+1. Is there a difference between the average salary between genders? If it is the case, in which profession we have the biggest salary gap per gender?
 
 2. What is the impact that scholarity have in the average salary?
 
 3. How does the age affect the salary?
 
-## First Dataset: Economist set
-We have seven variables in this dataset: contract hours, age, gender, scholarity, average salary, minimum per hour, and employment time. The table bellow was generated using R "summary" command and sit shows the general
+## Descritives
+We have seven variables in each dataset: scholarity (years), age (years), contract hours (hours per week), employment time (months), minimum salary (salary compared to the minimum wage) and average salary (brazilian reais). The table bellow was generated collecting the R "summary" command output for each profession. Each entry also has information about the gender of the employee, but since this information is categorical, it was omitted from the table.
 
-![General metrics for the variables in the dataset](images/estatistic_table.png)
+![](images/descritives.png)
 
-* Scholarity: 
+* **Number of observations:**
 
-Looking in how concentrate are the values for scholarity, I concluded that it would be difficult to infer information considering different scholarities inside a profession. However, probably it would be interesting to see how it behaves comparing different professions.
+**Architect:** 599
+
+**Civil Engineer:** 2.239
+
+**Doctor:** 4.214
+
+**Economist:** 961
+
+**Lawyer:** 2.476
+
+**Street Cleaner:** 49.001
+
+
+
+# General Analysis for each variable:
+* **Scholarity:**
+
+Inside professions, the values are really concentrated around the mean, and because of that it wouldn't be very helpful to analyse the impact of this variable inside a profession. However, since we have professions with a considerable distance between the means (e.g. doctor against street cleaner), we will try to compare how it impacts the salary.
+
+Bellow we have an graphical example of how close the values are from the mean for this variable. The dataset used for this plot was the "doctor general practice".
 
 ```{r}
 library(ggplot2)
 load(file="data/economist.Rdata")
-meanE <- mean(economist$Scholarity)
-std <- sd(economist$Scholarity)
-ggplot(data = economist, aes(economist$Scholarity)) + geom_bar(fill="white", colour = "black") + labs(x= "age") + geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") +  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed")  + geom_vline(aes(xintercept = median(economist$Scholarity), colour = "median"), linetype = "dashed") + scale_colour_manual(name = "Central Tendency Measurements", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
+load(file="data/street_cleaner.Rdata")
+load(file="data/doctor_general_practice.Rdata")
+meanE <- mean(doctor_general_practice$Scholarity)
+std <- sd(doctor_general_practice$Scholarity)
+plot = ggplot(data = doctor_general_practice, aes(doctor_general_practice$Scholarity)) + 
+  geom_bar(fill="white", colour = "black") + labs(x= "scholarity (years)", y = "people") + 
+  geom_vline(aes(xintercept = meanE, colour = "mean")) + 
+  geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") +  
+  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed")  + 
+  geom_vline(aes(xintercept = median(doctor_general_practice$Scholarity), colour = "median"), linetype = "dashed") + 
+  scale_colour_manual(name = "Legend", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
+plot
 ```
 
-* Age:
-For age, we have an interesting number of di
+* **Age:**
+
+In Brazil, it's possible to work after the 14 years (maximum of 6 hours per day until 16), and that's why we have observation on this age for the street cleaning dataset. However, for the other professions, it's expected from the employee to have more time of education in order to fulfill their tasks, and thus we have a higher minimum for the other 5 datasets, as well as a higher number of registerment around the 25 years, a common age to finish college studies. 
+
 
 ```{r}
+meanE <- mean(street_cleaner$age)
+std <- sd(street_cleaner$age)
+streetPlot = ggplot(data = street_cleaner, aes(street_cleaner$age)) + 
+  geom_bar(fill="white", colour = "black") + labs(x= "age (years)", y = "people") + 
+  geom_vline(aes(xintercept = meanE, colour = "mean")) + 
+  geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") + 
+  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed") + 
+  geom_vline(aes(xintercept = median(street_cleaner$age), colour = "median"), linetype = "dashed") + 
+  scale_colour_manual(name = "Legend", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
+streetPlot
 meanE <- mean(economist$age)
 std <- sd(economist$age)
-ggplot(data = economist, aes(economist$age)) + geom_bar(fill="white", colour = "black") + labs(x= "age")+ geom_vline(aes(xintercept = meanE, colour = "mean")) + geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") + geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed") + geom_vline(aes(xintercept = median(economist$age), colour = "median"), linetype = "dashed")   + scale_colour_manual(name = "Central Tendency Measurements", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
+economistPlot = ggplot(data = economist, aes(economist$age)) + 
+  geom_bar(fill="white", colour = "black") + labs(x= "age (years)", y = "people")+ 
+  geom_vline(aes(xintercept = meanE, colour = "mean")) + 
+  geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") + 
+  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed") + 
+  geom_vline(aes(xintercept = median(economist$age), colour = "median"), linetype = "dashed") + 
+  scale_colour_manual(name = "Legend", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
+economistPlot
 ```
+
+* **Contract Hours**
+
+* **Employment Time**
+
+* **Min Salary**
+
+* **Average Salary**
+
 
 ## Variables of interest against Average Salary
 For these plots, we are using the log of the average salary. This change does not affect the values order, it only escales the data, helping to visualize it. In this section we are focusing in age and gender.
@@ -92,4 +147,7 @@ ggplot(data = economist, aes(economist$age, log(economist$avg_salary)/ economist
 
 
 
+
+## Discussion
+Because of the law structure in Brazil, it's possible to have underrepresentation for some professions (like doctors and lawyers, that sometimes register as partners in their business), and sometimes we also have a problem concerning the profession used for the registration, since sometimes a professional can be registered in two different ways (e.g. economists sometimes are registered as "analysts").
 

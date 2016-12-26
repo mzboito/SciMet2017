@@ -15,4 +15,5 @@ street_cleaner$CBO2002 = NULL
 doctor_general_practice$CBO2002 = NULL
 
 #Saving data to access from the R markdown
-#save(name, file = "name.Rdata")
+#save(economist, file = "data/economist.Rdata")
+#save(street_cleaner, file = "data/street_cleaner.Rdata")
