@@ -3,8 +3,8 @@ title: "A study about salary difference in Brazil"
 author: "Marcely Zanon Boito"
 date: "December 21, 2016"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -28,7 +28,7 @@ Using this data, the objective is to identify how these different factors (age, 
 ## Descritives
 We have seven variables in each dataset: scholarity (years), age (years), contract hours (hours per week), employment time (months), minimum salary (salary compared to the minimum wage) and average salary (brazilian reais). The table bellow was generated collecting the R "summary" command output for each profession. Each entry also has information about the gender of the employee, but since this information is categorical, it was omitted from the table.
 
-![](images/descritives.png)
+![Descritives table](images/descritives.png)
 
 * **Number of observations:**
 
@@ -65,15 +65,19 @@ plot = ggplot(data = doctor_general_practice, aes(doctor_general_practice$Schola
   geom_vline(aes(xintercept = meanE, colour = "mean")) + 
   geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") +  
   geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed")  + 
-  geom_vline(aes(xintercept = median(doctor_general_practice$Scholarity), colour = "median"), linetype = "dashed") + 
-  scale_colour_manual(name = "Legend", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
+  geom_vline(aes(xintercept = median(doctor_general_practice$Scholarity), 
+                 colour = "median"), linetype = "dashed") + 
+  scale_colour_manual(name = "Legend", 
+                      breaks = c("mean", "std","median"), 
+                      values= c(mean = "red", std = "blue", median = "orange")) 
 plot
 ```
 
 * **Age:**
 
-In Brazil, it's possible to work after the 14 years (maximum of 6 hours per day until 16), and that's why we have observation on this age for the street cleaning dataset. However, for the other professions, it's expected from the employee to have more time of education in order to fulfill their tasks, and thus we have a higher minimum for the other 5 datasets, as well as a higher number of registerment around the 25 years, a common age to finish college studies. 
+In Brazil, it's possible to work after the 14 years (maximum of 6 hours per day until 16), and that's why we have observations for this age for the street cleaning dataset. However, for the other professions, since it's expected from the employee to have more time of education in order to fulfill their tasks, we have a higher minimum. For all the profesisons, we have a higher number of registers around 25 years, a common age to finish studies, and also around this age people have more mobility between jobs.
 
+In Brazil, the age for retirement in 2014 was 59 years.
 
 ```{r}
 meanE <- mean(street_cleaner$age)
@@ -83,8 +87,11 @@ streetPlot = ggplot(data = street_cleaner, aes(street_cleaner$age)) +
   geom_vline(aes(xintercept = meanE, colour = "mean")) + 
   geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") + 
   geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed") + 
-  geom_vline(aes(xintercept = median(street_cleaner$age), colour = "median"), linetype = "dashed") + 
-  scale_colour_manual(name = "Legend", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
+  geom_vline(aes(xintercept = median(street_cleaner$age), 
+                 colour = "median"), linetype = "dashed") + 
+  scale_colour_manual(name = "Legend", 
+                      breaks = c("mean", "std","median"), 
+                      values= c(mean = "red", std = "blue", median = "orange")) 
 streetPlot
 meanE <- mean(economist$age)
 std <- sd(economist$age)
@@ -93,19 +100,33 @@ economistPlot = ggplot(data = economist, aes(economist$age)) +
   geom_vline(aes(xintercept = meanE, colour = "mean")) + 
   geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") + 
   geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed") + 
-  geom_vline(aes(xintercept = median(economist$age), colour = "median"), linetype = "dashed") + 
-  scale_colour_manual(name = "Legend", breaks = c("mean", "std","median"), values= c(mean = "red", std = "blue", median = "orange")) 
+  geom_vline(aes(xintercept = median(economist$age), 
+                 colour = "median"), linetype = "dashed") + 
+  scale_colour_manual(name = "Legend", 
+                      breaks = c("mean", "std","median"), 
+                      values= c(mean = "red", std = "blue", median = "orange")) 
 economistPlot
 ```
 
-* **Contract Hours**
+* **Contract Hours:**
 
-* **Employment Time**
+In Brazil, the maximum number of hours per week allowed is 44, what explains the means concentraring close to this number.
 
-* **Min Salary**
+* **Employment Time:**
 
-* **Average Salary**
+sinceramente nao sei oq colocar aqui
 
+* **Min Salary:**
+
+This variable represent the relation between the employee salary and the minimum wage. In 2014, the national minimum wage was R$ 724,00. However, this number is not absolute, since some sectors and states have different minimum wage. Since it makes the comparison complicated (and to retrieve this information is equally difficult) we will consider the national minimum wage as reference for the analysis here. 
+
+* **Average Salary:**
+
+The variable we want to understand. In the next section we explore its relationship with the factors.
+
+
+
+REFORMULAR
 
 ## Variables of interest against Average Salary
 For these plots, we are using the log of the average salary. This change does not affect the values order, it only escales the data, helping to visualize it. In this section we are focusing in age and gender.
@@ -124,14 +145,6 @@ qplot(economist$age, (log(economist$avg_salary) / economist$contract_hours), yla
 ```
 
 After dividing the average salary per number of hours, the values are way more uniform. 
-
-
-
-```{r}
-qplot(economist$age, (log(economist$avg_salary) / economist$min_salary), ylab = "Average Salary per Minimum Salary", xlab = "Age") + geom_smooth()
-```
-
-????????????????
 
 # gender x salary
 ```{r}
