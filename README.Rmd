@@ -3,8 +3,8 @@ title: "A study about salary difference in Brazil"
 author: "Marcely Zanon Boito"
 date: "December 21, 2016"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -114,42 +114,100 @@ In Brazil, the maximum number of hours per week allowed is 44, what explains the
 
 * **Employment Time:**
 
-sinceramente nao sei oq colocar aqui
+Employment time represents the quantity of months that the employee worked registered in the profession in question. The graphs plotted below show the employment time per amount of people, and at first sight it can leads us to the false conclusion that people abandon their profession over time. However, different from that, probably what happens to give this format to the graphs is the relation between age and employment time in the datasets. As saw in the explanation for age, the graph for number of employees has its peak around the twenties, and these employees do not have a lot of time as registered employees (since they just started their professional life!). 
+
+
+```{r}
+meanE <- mean(street_cleaner$employment_time)
+std <- sd(street_cleaner$employment_time)
+streetPlot = ggplot(data = street_cleaner, aes(street_cleaner$employment_time)) + 
+  geom_bar(fill="white", colour = "black") + labs(x= "employment Time (months)", y = "people") + 
+  geom_vline(aes(xintercept = meanE, colour = "mean")) + 
+  geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") + 
+  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed") + 
+  geom_vline(aes(xintercept = median(street_cleaner$employment_time), 
+                 colour = "median"), linetype = "dashed") + 
+  scale_colour_manual(name = "Legend", 
+                      breaks = c("mean", "std","median"), 
+                      values= c(mean = "red", std = "blue", median = "orange")) 
+streetPlot
+meanE <- mean(economist$employment_time)
+std <- sd(economist$employment_time)
+economistPlot = ggplot(data = economist, aes(economist$employment_time)) + 
+  geom_bar(fill="white", colour = "black") + labs(x= "employment Time (months)", y = "people")+ 
+  geom_vline(aes(xintercept = meanE, colour = "mean")) + 
+  geom_vline(aes(xintercept = (meanE + std), colour = "std"), linetype = "dashed") + 
+  geom_vline(aes(xintercept = (meanE - std), colour = "std"), linetype = "dashed") + 
+  geom_vline(aes(xintercept = median(economist$employment_time), 
+                 colour = "median"), linetype = "dashed") + 
+  scale_colour_manual(name = "Legend", 
+                      breaks = c("mean", "std","median"), 
+                      values= c(mean = "red", std = "blue", median = "orange")) 
+economistPlot
+```
+
 
 * **Min Salary:**
 
-This variable represent the relation between the employee salary and the minimum wage. In 2014, the national minimum wage was R$ 724,00. However, this number is not absolute, since some sectors and states have different minimum wage. Since it makes the comparison complicated (and to retrieve this information is equally difficult) we will consider the national minimum wage as reference for the analysis here. 
+This variable represent the relation between the employee salary and the brazilian minimum wage. In 2014, the national minimum wage was R$ 724,00. However, this number is not absolute, since some sectors and states have different agreements for their minimum wages. Since it makes the comparison complicated (and to retrieve this information is equally difficult) we will consider the national minimum wage as reference for the analysis here. 
+
+The plot below is just an ilustration about how the minimum salary is just a different way of viewing the average salary. Because of that, it wouldn't make sense to include it in our set of possibles factors, and this variable will be excluded from further analysis in this report. 
+
+```{r}
+ggplot(data = economist, aes(economist$avg_salary, economist$min_salary)) + geom_point() + labs(y = "Avg Salary", x = "Min Salary") + geom_smooth()
+
+```
 
 * **Average Salary:**
 
-The variable we want to understand. In the next section we explore its relationship with the factors.
-
-
-
-REFORMULAR
+The variable whose behaviour we wish to summarize in a model. In the next section we explore its relationship with the other variables of the datasets. 
 
 ## Variables of interest against Average Salary
-For these plots, we are using the log of the average salary. This change does not affect the values order, it only escales the data, helping to visualize it. In this section we are focusing in age and gender.
 
-# Age x Salary
+Before jumping to comparisons between salary and other variables, I normalize the average salary to allow a fair comparison between the observation in our datasets. This normalization is needed because without it we could conclude that some cases in our dataset are receiving more or less money because of a given factor, where in fact it could only happen that theses people are working more than the others! Therefore, from now on I'm going to use the average salary divised by the number of hours worked, and I'm going to refer to this value as "normalized average salary".
+
+A second transformation that I do in our target variable is not related to its meaning, but just an range transformation. In order to better visualize and summarize the normalized average salary, for this analysis we are going to apply a logarithm on it, since it does not change the values order, just scales it.
+
+# Scholarity
+
+As discussed before, for this comparison, is not very useful to look at the discrepancies inside a profession, and because of that, here we compare the emsemble of professions based solely on their normalized average salary and their scholarity.
+
 ```{r}
-ggplot(data = economist, aes(economist$age, log(economist$avg_salary))) + geom_point() + labs(y = "Average Salary", x = "Age") + geom_smooth()
+load(file="data/dataset.Rdata")
+plot = ggplot(data= dataset, aes(factor(dataset$Scholarity), log(dataset$norm_avg_salary))) +
+  geom_boxplot() + labs(x = "scholarity (years)", y = "log(normalized avg salary)") 
+plot
+```
+# Age
+```{r}
+qplot(dataset$age, log(dataset$norm_avg_salary), ylab = "log(normalized avg salary)", xlab = "age", color = dataset$CBO2002) + geom_smooth(se = FALSE, method = "lm")
+
+```
+
+# Employment Time
+
+# Gender
+
+```{r}
+plot = ggplot(data=dataset, aes(x= factor(dataset$gender, labels=c("men","women")), 
+                                y=log(dataset$norm_avg_salary))) + 
+  geom_boxplot() + labs(x = "gender", y = "Average Salary") 
+plot
 ```
 
 
-Looking at these values together, it gives the impression that the average salary (despite some outliers) is increasing together with age. However, here we are not considering the amount of hours that each economist is working per month, and that could give us the false impression that someone old is receiving a lot more money (or vice-versa), where in reality they could be just working more. To fix that, I tried to plot the data using the variable contract hours to divide the average salary value, resulting in the plot below.
 
-```{r}
-qplot(economist$age, (log(economist$avg_salary) / economist$contract_hours), ylab = "Average Salary per Contract hours", xlab = "Age") + geom_smooth()
 
-```
 
-After dividing the average salary per number of hours, the values are way more uniform. 
 
-# gender x salary
-```{r}
-ggplot(data=economist, aes(x= factor(economist$gender), y=economist$avg_salary)) + geom_boxplot() + labs(x = "gender", y = "Average Salary") + geom_jitter(color = "gray")
-```
+
+
+
+
+
+
+
+antigo
 
 
 # Gender and Age against Average Salary
