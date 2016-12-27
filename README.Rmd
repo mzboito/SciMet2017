@@ -114,7 +114,7 @@ In Brazil, the maximum number of hours per week allowed is 44, what explains the
 
 * **Employment Time:**
 
-Employment time represents the quantity of months that the employee worked registered in the profession in question. The graphs plotted below show the employment time per amount of people, and at first sight it can leads us to the false conclusion that people abandon their profession over time. However, different from that, probably what happens to give this format to the graphs is the relation between age and employment time in the datasets. As saw in the explanation for age, the graph for number of employees has its peak around the twenties, and these employees do not have a lot of time as registered employees (since they just started their professional life!). 
+Employment time represents the quantity of months that the employee worked registered in the profession in question. The graphs plotted below show the employment time per amount of people. The graphs show us that we have a greater amount of people with small employment time. Considering that in general we are supposed to have much more younger people working (smaller employment time) than seniors (bigger employment time), the graphs format make sense.
 
 
 ```{r}
@@ -146,6 +146,22 @@ economistPlot = ggplot(data = economist, aes(economist$employment_time)) +
 economistPlot
 ```
 
+It's also interesting to explore the relationship between age and employment time. Does increasing the age mean increasing the employment time? Below I ploted these two, and tried to fit a linear model. 
+
+```{r}
+load(file="data/dataset.Rdata")
+plot = ggplot(data = dataset, aes(dataset$age,dataset$employment_time, color = dataset$CBO2002)) + 
+  geom_point() + labs(y = "employment time", x = "age") + geom_smooth(method= "lm",color=  "black")+
+  facet_wrap(~ dataset$CBO2002) 
+plot
+```
+It looks difficult to fit a model with so much variability for each age. Below, it's possible to see the summary for the regression (terrible adjusted R-squared value!).
+```{r}
+reg = lm(dataset$employment_time~dataset$age)
+summary(reg)
+```
+
+__Eu não sei se fez sentido o que eu fiz aqui... __
 
 * **Min Salary:**
 
@@ -154,8 +170,9 @@ This variable represent the relation between the employee salary and the brazili
 The plot below is just an ilustration about how the minimum salary is just a different way of viewing the average salary. Because of that, it wouldn't make sense to include it in our set of possibles factors, and this variable will be excluded from further analysis in this report. 
 
 ```{r}
-ggplot(data = economist, aes(economist$avg_salary, economist$min_salary)) + geom_point() + labs(y = "Avg Salary", x = "Min Salary") + geom_smooth()
-
+plot = ggplot(data = economist, aes(economist$avg_salary, economist$min_salary)) + 
+  geom_point() + labs(y = "Avg Salary", x = "Min Salary") + geom_smooth()
+plot
 ```
 
 * **Average Salary:**
@@ -173,25 +190,82 @@ A second transformation that I do in our target variable is not related to its m
 As discussed before, for this comparison, is not very useful to look at the discrepancies inside a profession, and because of that, here we compare the emsemble of professions based solely on their normalized average salary and their scholarity.
 
 ```{r}
-load(file="data/dataset.Rdata")
 plot = ggplot(data= dataset, aes(factor(dataset$Scholarity), log(dataset$norm_avg_salary))) +
   geom_boxplot() + labs(x = "scholarity (years)", y = "log(normalized avg salary)") 
 plot
 ```
+
+This visualization help us to identify a possible relationship between the salary and the scholarity. Although between the first seven years of scholarity we do not seem to have a considerable difference, from the eighth to the nineth year, it seems to impact drastically the average salary of the employee.
+
+When plotting this, the first thing that I thought was: but, it is fair? My fear was that I would be comparing two disjoint sets: a set that goes from one year of scholarity to eight, and a different set of professions that require at least nine years of scholarity. However, fortunately, after plotting scholarity per profession (below) I was able to see that, even if we do have a profession where it seems to be a requirement to be above eight (medicine), all the others professions overlap, what makes the comparison valid.
+
+
+```{r}
+plot = ggplot(data= dataset, aes(factor(dataset$Scholarity), log(dataset$norm_avg_salary))) +
+  geom_boxplot() + labs(x = "scholarity (years)", y = "log(normalized avg salary)") +
+  facet_wrap(~ dataset$CBO2002) 
+plot
+```
+
 # Age
 ```{r}
-qplot(dataset$age, log(dataset$norm_avg_salary), ylab = "log(normalized avg salary)", xlab = "age", color = dataset$CBO2002) + geom_smooth(se = FALSE, method = "lm")
-
+plot = ggplot(data = dataset, aes(dataset$age, log(dataset$norm_avg_salary), 
+                                  color = dataset$CBO2002)) + geom_point() + 
+  geom_smooth(color = "black") + labs(x = "age", y = "log(normalized avg salary)") + 
+  facet_wrap(~ dataset$CBO2002) 
 ```
 
 # Employment Time
+
+```{r}
+plot = ggplot(data = dataset, aes(dataset$employment_time, log(dataset$norm_avg_salary), 
+                                  color = dataset$CBO2002)) + geom_point() + 
+  geom_smooth(color = "black") + labs(x = "employment time", y = "log(normalized avg salary)") +
+  facet_wrap(~ dataset$CBO2002) 
+plot
+```
+
+Similar as when comparing age with employment time, the observations seem to have a huge variability.
+
+
+__como eu faço pra lidar com essa nuvem gigante de pontos? DDDDD=__
+
+
+
+__Se tu souberes como mudar o nome dessa legenda, eu vou ficar bem feliz, pq fiquei uma hora tentando__
+
+
 
 # Gender
 
 ```{r}
 plot = ggplot(data=dataset, aes(x= factor(dataset$gender, labels=c("men","women")), 
                                 y=log(dataset$norm_avg_salary))) + 
-  geom_boxplot() + labs(x = "gender", y = "Average Salary") 
+  geom_boxplot() + labs(x = "gender", y = "log(normalized avg salary)") 
+plot
+```
+
+
+não me diz nada, tenho q plotar por escolaridade e profissão!
+
+
+```{r}
+plot = ggplot(data=dataset, aes(x= factor(dataset$gender, labels=c("men","women")), 
+                                y=log(dataset$norm_avg_salary))) + 
+  geom_boxplot() + labs(x = "gender", y = "log(normalized avg salary)") +
+  facet_wrap(~ dataset$Scholarity) 
+plot
+```
+
+NÃO TEM HOMEM COM ESCOLARIDADE MAIOR QUE 6??????????????????????????
+
+Isso não faz sentido! Médico é só com escolaridade acima de 9, e no plot de baixo dá pra ver que tem um monte de homem médico!
+
+```{r}
+plot = ggplot(data=dataset, aes(x= factor(dataset$gender, labels=c("men","women")), 
+                                y=log(dataset$norm_avg_salary))) + 
+  geom_boxplot() + labs(x = "gender", y = "log(normalized avg salary)") +
+  facet_wrap(~ dataset$CBO2002) 
 plot
 ```
 
@@ -200,14 +274,7 @@ plot
 
 
 
-
-
-
-
-
-
-
-antigo
+A PARTIR DAQUI É ANTIGO, NEM PERCA SEU TEMPO LENDO
 
 
 # Gender and Age against Average Salary
