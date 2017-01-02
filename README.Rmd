@@ -3,8 +3,8 @@ title: "A study about salary difference in Brazil"
 author: "Marcely Zanon Boito"
 date: "December 21, 2016"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -114,7 +114,7 @@ In Brazil, the maximum number of hours per week allowed is 44, what explains the
 
 * **Employment Time:**
 
-Employment time represents the quantity of months that the employee worked registered in the profession in question. The graphs plotted below show the employment time per amount of people. The graphs show us that we have a greater amount of people with small employment time. Considering that in general we are supposed to have much more younger people working (smaller employment time) than seniors (bigger employment time), the graphs format make sense.
+Employment time represents the quantity of months that the employee worked registered in a company. The graphs plotted below show the employment time per amount of people. The graphs show us that we have a greater amount of people with small employment time. Considering that in general we are supposed to have much more younger people working (smaller employment time) than seniors (bigger employment time), the graphs format make sense.
 
 
 ```{r}
@@ -151,17 +151,18 @@ It's also interesting to explore the relationship between age and employment tim
 ```{r}
 load(file="data/dataset.Rdata")
 plot = ggplot(data = dataset, aes(dataset$age,dataset$employment_time, color = dataset$CBO2002)) + 
-  geom_point() + labs(y = "employment time", x = "age") + geom_smooth(method= "lm",color=  "black")+
-  facet_wrap(~ dataset$CBO2002) 
+  geom_point() + labs(y = "employment time", x = "age") + geom_smooth(method= "lm",color=  "black", formula = y ~ 0 + x)+
+  facet_wrap(~ dataset$CBO2002) + theme(legend.title=element_blank())
 plot
 ```
-It looks difficult to fit a model with so much variability for each age. Below, it's possible to see the summary for the regression (terrible adjusted R-squared value!).
+
+In this model, I removed the intecept, since it would give unreasonable values for the variables in question (in no scenario a person with zero age would already have time of employment). Also, the graph above makes us think about the correlation between the variables, expressed bellow:
+
 ```{r}
-reg = lm(dataset$employment_time~dataset$age)
-summary(reg)
+cor(dataset$employment_time, dataset$age)
 ```
 
-__Eu não sei se fez sentido o que eu fiz aqui... __
+The variables are definately positively correlated, but the correlation score is not that high. That, and considering that we have a big cloud of points which can affect Pearson's correlation (it is affected by the sample size), I decided to keep both variables for the analysis.
 
 * **Min Salary:**
 
@@ -178,6 +179,19 @@ plot
 * **Average Salary:**
 
 The variable whose behaviour we wish to summarize in a model. In the next section we explore its relationship with the other variables of the datasets. 
+
+
+
+```{r}
+
+ # geom_point() + labs(y = "employment time", x = "age") + geom_smooth(method= "lm",color=  "black", formula = y ~ 0 + x)+
+#  facet_wrap(~ dataset$CBO2002) 
+
+plot = ggplot(data = dataset, aes(dataset$avg_salary, color = dataset$CBO2002)) + 
+  geom_histogram(fill = "white", bins = 20) + labs(x= "average salary", y = "people") +
+  facet_wrap(~ dataset$CBO2002) + theme(legend.title=element_blank())
+plot
+```
 
 ## Variables of interest against Average Salary
 
@@ -221,7 +235,7 @@ plot = ggplot(data = dataset, aes(dataset$age, log(dataset$norm_avg_salary),
 plot = ggplot(data = dataset, aes(dataset$employment_time, log(dataset$norm_avg_salary), 
                                   color = dataset$CBO2002)) + geom_point() + 
   geom_smooth(color = "black") + labs(x = "employment time", y = "log(normalized avg salary)") +
-  facet_wrap(~ dataset$CBO2002) 
+  facet_wrap(~ dataset$CBO2002) + theme(legend.title=element_blank())
 plot
 ```
 
