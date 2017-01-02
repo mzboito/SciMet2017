@@ -3,8 +3,8 @@ title: "A study about salary difference in Brazil"
 author: "Marcely Zanon Boito"
 date: "December 21, 2016"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -112,6 +112,13 @@ economistPlot
 
 In Brazil, the maximum number of hours per week allowed is 44, what explains the means concentraring close to this number.
 
+* **Gender:**
+
+Below, a table showing the gender distribution in our dataset, separated by profession.
+
+![Gender percentage per profession](images/gender.png)
+
+
 * **Employment Time:**
 
 Employment time represents the quantity of months that the employee worked registered in a company. The graphs plotted below show the employment time per amount of people. The graphs show us that we have a greater amount of people with small employment time. Considering that in general we are supposed to have much more younger people working (smaller employment time) than seniors (bigger employment time), the graphs format make sense.
@@ -162,7 +169,7 @@ In this model, I removed the intecept, since it would give unreasonable values f
 cor(dataset$employment_time, dataset$age)
 ```
 
-The variables are definately positively correlated, but the correlation score is not that high. That, and considering that we have a big cloud of points which can affect Pearson's correlation (it is affected by the sample size), I decided to keep both variables for the analysis.
+The variables are definately positively correlated, but the correlation score is not that high. That and considering that we have a big cloud of points which can affect Pearson's correlation (since it is affected by the sample size), both variables were kept for the analysis.
 
 * **Min Salary:**
 
@@ -180,24 +187,26 @@ plot
 
 The variable whose behaviour we wish to summarize in a model. In the next section we explore its relationship with the other variables of the datasets. 
 
-
-
 ```{r}
 
  # geom_point() + labs(y = "employment time", x = "age") + geom_smooth(method= "lm",color=  "black", formula = y ~ 0 + x)+
 #  facet_wrap(~ dataset$CBO2002) 
 
 plot = ggplot(data = dataset, aes(dataset$avg_salary, color = dataset$CBO2002)) + 
-  geom_histogram(fill = "white", bins = 20) + labs(x= "average salary", y = "people") +
+  geom_histogram(fill = "white", bins = 50) + labs(x= "average salary", y = "people") +
   facet_wrap(~ dataset$CBO2002) + theme(legend.title=element_blank())
 plot
 ```
+
+This plot above is an histogram of the average salary per profession, and it does not give us a lot of information. It is difficult to have a suitable bucket number while not charging the visualization. Therefore, in the next section I start discussing how to scales this variable, in order to simplify the visualization and help the analysis.
 
 ## Variables of interest against Average Salary
 
 Before jumping to comparisons between salary and other variables, I normalize the average salary to allow a fair comparison between the observation in our datasets. This normalization is needed because without it we could conclude that some cases in our dataset are receiving more or less money because of a given factor, where in fact it could only happen that theses people are working more than the others! Therefore, from now on I'm going to use the average salary divised by the number of hours worked, and I'm going to refer to this value as "normalized average salary".
 
 A second transformation that I do in our target variable is not related to its meaning, but just an range transformation. In order to better visualize and summarize the normalized average salary, for this analysis we are going to apply a logarithm on it, since it does not change the values order, just scales it.
+
+It is important to consider that applying the log operation on the average salary will change the interpretation of the results for the final regression, which will be explained on the next section.
 
 # Scholarity
 
@@ -226,7 +235,8 @@ plot
 plot = ggplot(data = dataset, aes(dataset$age, log(dataset$norm_avg_salary), 
                                   color = dataset$CBO2002)) + geom_point() + 
   geom_smooth(color = "black") + labs(x = "age", y = "log(normalized avg salary)") + 
-  facet_wrap(~ dataset$CBO2002) 
+  facet_wrap(~ dataset$CBO2002) + theme(legend.title=element_blank())
+plot
 ```
 
 # Employment Time
@@ -234,21 +244,13 @@ plot = ggplot(data = dataset, aes(dataset$age, log(dataset$norm_avg_salary),
 ```{r}
 plot = ggplot(data = dataset, aes(dataset$employment_time, log(dataset$norm_avg_salary), 
                                   color = dataset$CBO2002)) + geom_point() + 
-  geom_smooth(color = "black") + labs(x = "employment time", y = "log(normalized avg salary)") +
+  geom_smooth(color = "black") + labs(x = "employment time", 
+                                      y = "log(normalized avg salary)") +
   facet_wrap(~ dataset$CBO2002) + theme(legend.title=element_blank())
 plot
 ```
 
 Similar as when comparing age with employment time, the observations seem to have a huge variability.
-
-
-__como eu faço pra lidar com essa nuvem gigante de pontos? DDDDD=__
-
-
-
-__Se tu souberes como mudar o nome dessa legenda, eu vou ficar bem feliz, pq fiquei uma hora tentando__
-
-
 
 # Gender
 
@@ -260,20 +262,7 @@ plot
 ```
 
 
-não me diz nada, tenho q plotar por escolaridade e profissão!
 
-
-```{r}
-plot = ggplot(data=dataset, aes(x= factor(dataset$gender, labels=c("men","women")), 
-                                y=log(dataset$norm_avg_salary))) + 
-  geom_boxplot() + labs(x = "gender", y = "log(normalized avg salary)") +
-  facet_wrap(~ dataset$Scholarity) 
-plot
-```
-
-NÃO TEM HOMEM COM ESCOLARIDADE MAIOR QUE 6??????????????????????????
-
-Isso não faz sentido! Médico é só com escolaridade acima de 9, e no plot de baixo dá pra ver que tem um monte de homem médico!
 
 ```{r}
 plot = ggplot(data=dataset, aes(x= factor(dataset$gender, labels=c("men","women")), 
@@ -283,23 +272,44 @@ plot = ggplot(data=dataset, aes(x= factor(dataset$gender, labels=c("men","women"
 plot
 ```
 
+## Putting everything together
+
+# Mincer Earnings Function
+The Mincer earnings function was published in 1974 and it models the salary in function of year of education (scholarity), experience in the market (employment time and age) and other factors (such as gender). It is one of the most widely used models in empirical economics.
+
+The Mincer model is defined by the function that follows:
+
+ln norm_avg_salary = B0 + B1 scholarity + B2 X + B3 X^2 + G' gender + error
+
+Where X is experience in the market, B0 is the salary of an individual with no education and no experience, B1, B2, B3 and G' are the adjust parameters.
 
 
-
-
-
-A PARTIR DAQUI É ANTIGO, NEM PERCA SEU TEMPO LENDO
-
-
-# Gender and Age against Average Salary
 ```{r}
-ggplot(data = economist, aes(economist$age, log(economist$avg_salary)/ economist$contract_hours )) + geom_point(color = factor(economist$gender)) + labs(y = "Average Salary", x = "Age") + scale_colour_manual(name = "lol", breaks = "gender", values = c(gender = "blue"))
+
 ```
 
 
 
 
 
+
+# Adjusting the Regression
+
+
+
+
 ## Discussion
 Because of the law structure in Brazil, it's possible to have underrepresentation for some professions (like doctors and lawyers, that sometimes register as partners in their business), and sometimes we also have a problem concerning the profession used for the registration, since sometimes a professional can be registered in two different ways (e.g. economists sometimes are registered as "analysts").
+
+
+## References
+
+* Sites aboutt Mincer Earnings Function:
+
+https://en.wikipedia.org/wiki/Mincer_earnings_function
+
+http://eml.berkeley.edu/~cle/wp/wp62.pdf
+
+http://www.cps.fgv.br/cps/pesquisas/Politicas_sociais_alunos/2011/pdf/BES_EquacaoMinceriana.pdf (in portuguese)
+
 
