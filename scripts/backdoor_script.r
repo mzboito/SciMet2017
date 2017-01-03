@@ -14,6 +14,15 @@ lawyer$CBO2002 = "lawyer"
 street_cleaner$CBO2002 = "street_cleaner"
 doctor_general_practice$CBO2002 = "doctor_gp"
 
+architect["norm_avg_salary"] = architect$avg_salary / architect$contract_hours
+civil_engineer["norm_avg_salary"] = civil_engineer$avg_salary / civil_engineer$contract_hours
+economist["norm_avg_salary"] = economist$avg_salary / economist$contract_hours
+lawyer["norm_avg_salary"] = lawyer$avg_salary / lawyer$contract_hours
+street_cleaner["norm_avg_salary"] = street_cleaner$avg_salary / street_cleaner$contract_hours
+doctor_general_practice["norm_avg_salary"] = doctor_general_practice$avg_salary / doctor_general_practice$contract_hours
+
+
+
 #Saving data to access from the R markdown
 save(architect, file = "data/architect.Rdata")
 save(civil_engineer, file = "data/civil_engineer.Rdata")
@@ -23,5 +32,4 @@ save(lawyer, file = "data/lawyer.Rdata")
 save(street_cleaner, file = "data/street_cleaner.Rdata")
 
 dataset = rbind(architect, civil_engineer, doctor_general_practice, economist, lawyer, street_cleaner)
-dataset["norm_avg_salary"] = dataset$avg_salary / dataset$contract_hours
 save(dataset, file = "data/dataset.Rdata")
