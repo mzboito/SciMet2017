@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ## The Datasets
 In this report, I use datasets from the Brazilian Department of Labour, more specificaly from the RAIS report (Social Informations Annual Report). 
-These datasets contain information about all people registered as regular workers for the selected professions in 2014, following the "CBO" (brazilian official classification of professions).
+These datasets contain information about all people registered as regular workers for the selected professions in 2014, following the "CBO" (brazilian official classification of professions), and the entries are from one of the 27 Brazil states.
 
 This information is available because in Brazil, every time that an employer contracts, promotes or terminates an employee contract, it's mandatory to include this information in the government system. For this study, we have six datasets, each one representing a different profession: architecture, medicine, engineering, economy, law and street cleaning.
 
@@ -204,9 +204,9 @@ This plot above is an histogram of the average salary per profession, and it doe
 
 Before jumping to comparisons between salary and other variables, I normalize the average salary to allow a fair comparison between the observation in our datasets. This normalization is needed because without it we could conclude that some cases in our dataset are receiving more or less money because of a given factor, where in fact it could only happen that theses people are working more than the others! Therefore, from now on I'm going to use the average salary divised by the number of hours worked, and I'm going to refer to this value as "normalized average salary".
 
-A second transformation that I do in our target variable is not related to its meaning, but just an range transformation. In order to better visualize and summarize the normalized average salary, for this analysis we are going to apply a logarithm on it, since it does not change the values order, just scales it.
+A second transformation that I do in our target variable is not related to its meaning, but just an range transformation. In order to better visualize and summarize the normalized average salary, for this analysis we are going to apply a natural logarithm on it, since it does not change the values order, just scales it.
 
-It is important to consider that applying the log operation on the average salary will change the interpretation of the results for the final regression, which will be explained on the next section.
+It is important to consider that applying the log operation on the average salary will change the interpretation of the results for the final regression, and it will be interpreted as the percentage salary variance given the absolute variance for the other variables.
 
 # Scholarity
 
@@ -244,7 +244,7 @@ plot
 ```{r}
 plot = ggplot(data = dataset, aes(dataset$employment_time, log(dataset$norm_avg_salary), 
                                   color = dataset$CBO2002)) + geom_point() + 
-  geom_smooth(color = "black") + labs(x = "employment time", 
+  geom_smooth(color = "black", method = lm) + labs(x = "employment time", 
                                       y = "log(normalized avg salary)") +
   facet_wrap(~ dataset$CBO2002) + theme(legend.title=element_blank())
 plot
@@ -272,28 +272,57 @@ plot = ggplot(data=dataset, aes(x= factor(dataset$gender, labels=c("men","women"
 plot
 ```
 
-## Putting everything together
 
-# Mincer Earnings Function
-The Mincer earnings function was published in 1974 and it models the salary in function of year of education (scholarity), experience in the market (employment time and age) and other factors (such as gender). It is one of the most widely used models in empirical economics.
+## Mincer Earnings Function
+The Mincer earnings function was published in 1974 and it models the salary in function of years of education (scholarity), experience in the market (here approximated by the age) and other factors (such as gender and employment time). It is one of the most widely used models in empirical economics, and more information can be found at [1].
 
-The Mincer model is defined by the function that follows:
+The Mincer model used in this report is the combination of all the variables investigated in the last section. It is defined as follows:
 
-ln norm_avg_salary = B0 + B1 scholarity + B2 X + B3 X^2 + G' gender + error
+ln norm_avg_salary = B0 + B1 scholarity + B2 age + B3 age^2 + + B4 gender + B5 employment_time + error
 
-Where X is experience in the market, B0 is the salary of an individual with no education and no experience, B1, B2, B3 and G' are the adjust parameters.
-
+Where B0 is the salary of an individual with no education and no experience, and B1, B2, B3, B4 and B5 are the adjust parameters.
 
 ```{r}
+reg = lm(data = dataset, 
+         formula = log(dataset$norm_avg_salary) ~ dataset$Scholarity + 
+           dataset$age + dataset$gender + dataset$employment_time  + 
+           I(dataset$age^2))
 
+summary(reg)
 ```
 
+The regression summary confirms the relationship between our factor and response variables, discarting totally the null hypothesis. However, we do not have a good adjusted R-squared value (only 0.5674), what probably can be explained by the noisy nature of our dataset, which was illustrated in the last section and is again shown in the plot bellow:
+
+```{r}
+plot = ggplot(data = dataset, aes(log(dataset$norm_avg_salary),dataset$age)) + 
+  geom_point() + geom_smooth(method = lm, formula = y ~ x + I(x^2))
+plot
+```
+
+With this level of noise, I would say it is impossible to fit a model with a good R-squared value!
+
+Also, a pitfall that I fell when trying to fit this regression was to remove the intercept for this model, which give us the summary bellow:
+
+```{r}
+reg = lm(data = dataset, formula = log(dataset$norm_avg_salary) ~ 0 + 
+           dataset$Scholarity + dataset$age + dataset$gender + 
+           dataset$employment_time  + I(dataset$age^2))
+summary(reg)
+```
+
+Looking just at the adjusted R-squared, it looks a perfect fit. However, removing the intercept (B0 at the mincer model defined above) is not right for two reasons. First because it is part of the model, and therefore it has a weight on it. The second reason I discovered after some research, looking at the discussion at [2]. 
+
+Basically, what happens when one removes the intercept is that R uses a modified form of the equation to compare the current model to the reference model (that only contains the intercept). Since it does not have the intercept, it implicitly uses as reference model a model made of noise only. In cases as this dataset, where we have a huge cloud of points, this factor ends up dominating the value, giving us the false impression of fitting. 
+
+Finally, a final hint that removing the intercept is not a good idea, is our number of degrees of freedom, which is ridiculously small compared to the size of our dataset (49.001 observations).
 
 
 
 
 
-# Adjusting the Regression
+
+
+
 
 
 
@@ -304,12 +333,17 @@ Because of the law structure in Brazil, it's possible to have underrepresentatio
 
 ## References
 
-* Sites aboutt Mincer Earnings Function:
+* [1] Sites aboutt Mincer Earnings Function:
 
 https://en.wikipedia.org/wiki/Mincer_earnings_function
 
 http://eml.berkeley.edu/~cle/wp/wp62.pdf
 
 http://www.cps.fgv.br/cps/pesquisas/Politicas_sociais_alunos/2011/pdf/BES_EquacaoMinceriana.pdf (in portuguese)
+
+* [2] Removing statistically significant intercept term increases R² in linear model:
+
+http://stats.stackexchange.com/questions/26176/removal-of-statistically-significant-intercept-term-increases-r2-in-linear-mo
+
 
 
