@@ -3,8 +3,8 @@ title: "A study about salary difference in Brazil"
 author: "Marcely Zanon Boito"
 date: "December 21, 2016"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -407,8 +407,13 @@ Then, with this information we can calcule the difference between the salary for
 These values are in percentage. The profession economist, where we have the biggest salary gap, is a field with discrepancy close to 0.52% between salaries. At the same time, it is interesting to notice the profession architect, where women gain more than men (approximately 0.01%)!
 
 **2. What is the impact that scholarity have in the average salary?**
+In our datasets, the street cleaner seems to be the only profession with representability for all levels of scholarity. There, we found a considerable increase between 4 to 5 (0.44%), and also a considerable increase between 6 and 7 (0.42%). Besides that, what we have as information is that this variable impacts positively the salary.
 
+```{r}
+load(file="data/avg_street_cleaner.Rdata")
+plot(factor(avg_street_cleaner$V1), avg_street_cleaner$V2, ylab = "log(normalized avg salary)", xlab = "scholarity")
 
+```
 
 **3. How does the age affect the salary?**
 

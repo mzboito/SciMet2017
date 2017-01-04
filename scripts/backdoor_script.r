@@ -33,3 +33,6 @@ save(street_cleaner, file = "data/street_cleaner.Rdata")
 
 dataset = rbind(architect, civil_engineer, doctor_general_practice, economist, lawyer, street_cleaner)
 save(dataset, file = "data/dataset.Rdata")
+
+avg_street_cleaner = read.csv("data/street_cleaner_avg.csv", header = FALSE)
+save(avg_street_cleaner, file = "data/avg_street_cleaner.Rdata")
