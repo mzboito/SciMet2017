@@ -344,9 +344,12 @@ summary(reg)
 
 ### Doctor General Practice
 ```{r}
-reg = lm(data = doctor_general_practice, formula = log(doctor_general_practice$norm_avg_salary) ~ + 
-           doctor_general_practice$Scholarity + doctor_general_practice$age + doctor_general_practice$gender + 
-           doctor_general_practice$employment_time  + I(doctor_general_practice$age^2))
+reg = lm(data = doctor_general_practice, 
+         formula = log(doctor_general_practice$norm_avg_salary) ~ + 
+           doctor_general_practice$Scholarity + doctor_general_practice$age + 
+           doctor_general_practice$gender + 
+           doctor_general_practice$employment_time  + 
+           I(doctor_general_practice$age^2))
 summary(reg)
 ```
 
@@ -375,19 +378,7 @@ summary(reg)
 ```
 
 ### Discussion
-It seems that Mincer model for the normal logarithm of the normalized salary was well fitted for most of the professions, the profession doctor the drastic case where it seems to only have significant relation the employment time and maybe scholarity. 
-
-
-In the plot below we can see the difference of the fitted model considering only age.
-```{r}
-plot = ggplot(data = dataset, aes(dataset$age, log(dataset$norm_avg_salary), 
-                                  color = dataset$CBO2002)) + geom_point() + 
-  geom_smooth(color = "black", method = lm, formula = y ~ x + I(x^2)) + labs(x = "age", y = "log(normalized avg salary)") + 
-  facet_wrap(~ dataset$CBO2002) + theme(legend.title=element_blank())
-plot
-```
-
-Now, with these models, I will try to answer the questions that I presented in the beginning of the document:
+It seems that Mincer model for the normal logarithm of the normalized salary was well fitted for most of the professions, the profession doctor the drastic case where it seems to only have significant relation the employment time and maybe scholarity. Now, with these models, I will try to answer the questions that I presented in the beginning of the document:
 
 **1. Is there a difference between the average salary between genders? If it is the case, in which profession we have the biggest salary gap per gender?**
 
@@ -407,23 +398,34 @@ Then, with this information we can calcule the difference between the salary for
 These values are in percentage. The profession economist, where we have the biggest salary gap, is a field with discrepancy close to 0.52% between salaries. At the same time, it is interesting to notice the profession architect, where women gain more than men (approximately 0.01%)!
 
 **2. What is the impact that scholarity have in the average salary?**
-In our datasets, the street cleaner seems to be the only profession with representability for all levels of scholarity. There, we found a considerable increase between 4 to 5 (0.44%), and also a considerable increase between 6 and 7 (0.42%). Besides that, what we have as information is that this variable impacts positively the salary.
+In our datasets, the street cleaner seems to be the only profession with representability for all levels of scholarity. There, we found a considerable increase between 4 to 5 (0.44%) and between 6 and 7 (0.42%). However, I would know how to explain the decreases that we see between 5 and 6 without further investigation, that will not be realized here due to lack of time.
 
 ```{r}
 load(file="data/avg_street_cleaner.Rdata")
-plot(factor(avg_street_cleaner$V1), avg_street_cleaner$V2, ylab = "log(normalized avg salary)", xlab = "scholarity")
-
+plot(factor(avg_street_cleaner$V1), avg_street_cleaner$V2, 
+            ylab = "log(normalized avg salary)", xlab = "scholarity")
 ```
 
 **3. How does the age affect the salary?**
 
+```{r}
+plot = ggplot(data = dataset, aes(dataset$age, log(dataset$norm_avg_salary), 
+                                  color = dataset$CBO2002)) + geom_point() + 
+  geom_smooth(color = "black", method = lm, formula = y ~ x + I(x^2)) +
+  labs(x = "age", y = "log(normalized avg salary)") + 
+  facet_wrap(~ dataset$CBO2002) + theme(legend.title=element_blank())
+plot
+```
+The age affects the salary in two different ways, here interpreted as: gain and the loss of produtivity when getting older. The interpretation is that the salary increases with the age until a "golden age", after which it starts to decrease.
 
 
 
 ## Conclusion
 Because of the law structure in Brazil, it's possible to have underrepresentation for some professions (like doctors and lawyers, that sometimes register as partners in their business), and sometimes we also have a problem concerning the profession used for the registration, since sometimes a professional can be registered in two different ways (e.g. economists sometimes are registered as "analysts").
 
+I was able to identify a salary discrepancy for almost all the datasets, and I was also able to confirm the quadratic relation between the age and the salary, following the Mincer model for earnings. 
 
+I didn't conclude much from the scholarity variable (besides the fact that it affects the final salary) and it requires further analysis.
 
 ## References
 

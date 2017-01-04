@@ -23,4 +23,4 @@ In the folder script, there is a R script that treat and save the data in the ex
 
 COMMENTS:
 
-I provided a PDF version, but the report is "nicer" when read on the html format.
+I provided a PDF version, but the report is way "nicer" when read on the html format.
