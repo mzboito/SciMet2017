@@ -58,6 +58,9 @@ library(ggplot2)
 load(file="data/economist.Rdata")
 load(file="data/street_cleaner.Rdata")
 load(file="data/doctor_general_practice.Rdata")
+load(file="data/architect.Rdata")
+load(file="data/civil_engineer.Rdata")
+load(file="data/lawyer.Rdata")
 meanE <- mean(doctor_general_practice$Scholarity)
 std <- sd(doctor_general_practice$Scholarity)
 plot = ggplot(data = doctor_general_practice, aes(doctor_general_practice$Scholarity)) + 
@@ -371,7 +374,48 @@ reg = lm(data = street_cleaner, formula = log(street_cleaner$norm_avg_salary) ~ 
 summary(reg)
 ```
 
-## Conclusions
+### Discussion
+It seems that Mincer model for the normal logarithm of the normalized salary was well fitted for most of the professions, the profession doctor the drastic case where it seems to only have significant relation the employment time and maybe scholarity. 
+
+
+In the plot below we can see the difference of the fitted model considering only age.
+```{r}
+plot = ggplot(data = dataset, aes(dataset$age, log(dataset$norm_avg_salary), 
+                                  color = dataset$CBO2002)) + geom_point() + 
+  geom_smooth(color = "black", method = lm, formula = y ~ x + I(x^2)) + labs(x = "age", y = "log(normalized avg salary)") + 
+  facet_wrap(~ dataset$CBO2002) + theme(legend.title=element_blank())
+plot
+```
+
+Now, with these models, I will try to answer the questions that I presented in the beginning of the document:
+
+**1. Is there a difference between the average salary between genders? If it is the case, in which profession we have the biggest salary gap per gender?**
+
+The regressions (excluding the doctor dataset) gave us the prove that the gender is a variable that helps us to explain the model, which means it has an impact in the salary. 
+Then, with this information we can calcule the difference between the salary for a woman and a man in a profession, to find the biggest gap:
+
+* architect: -0.0116690918024
+
+* civil engineer: 0.139170680059
+
+* **economist: 0.521903520552**
+
+* lawyer: 0.288922295832
+
+* street cleaner: 0.230664127093
+
+These values are in percentage. The profession economist, where we have the biggest salary gap, is a field with discrepancy close to 0.52% between salaries. At the same time, it is interesting to notice the profession architect, where women gain more than men (approximately 0.01%)!
+
+**2. What is the impact that scholarity have in the average salary?**
+
+
+
+**3. How does the age affect the salary?**
+
+
+
+
+## Conclusion
 Because of the law structure in Brazil, it's possible to have underrepresentation for some professions (like doctors and lawyers, that sometimes register as partners in their business), and sometimes we also have a problem concerning the profession used for the registration, since sometimes a professional can be registered in two different ways (e.g. economists sometimes are registered as "analysts").
 
 
