@@ -19,7 +19,7 @@ Using this data, the objective is to identify how these different factors (age, 
 
 HOW TO REPLICATE:
 
-In the folder script, there is one script that treat and save the data in the exact form that is used on the RMarkdown format.
+In the folder script, there is a R script that treat and save the data in the exact form that is used on the RMarkdown format.
 
 COMMENTS:
 
